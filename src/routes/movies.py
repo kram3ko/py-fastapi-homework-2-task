@@ -7,6 +7,8 @@ from schemas.movies import (
     MovieDetailResponseSchema,
     MovieCreateSchema,
     MovieUpdateSchema,
+    MovieDetailSchema,
+    MovieUpdateResponseSchema,
 )
 from services.movie_crud import MovieService
 from mappers.movie_mapper import MovieMapper
@@ -77,9 +79,11 @@ async def delete_movie(movie_id: int, db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.patch("/movies/{movie_id}/")
+@router.patch("/movies/{movie_id}/", response_model=MovieUpdateResponseSchema)
 async def update_movie(
-    movie_id: int, movie_data: MovieUpdateSchema, db: AsyncSession = Depends(get_db)
+    movie_id: int,
+    movie_data: MovieUpdateSchema,
+    db: AsyncSession = Depends(get_db)
 ):
     movie_service = MovieService(db)
     movie = await movie_service.update_movie(movie_id, movie_data)
@@ -87,7 +91,10 @@ async def update_movie(
     if not movie:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Movie with the given ID was not found.",
+            detail="Movie with the given ID was not found."
         )
 
-    return {"detail": "Movie updated successfully."}
+    return {
+        **MovieMapper.to_detail_response(movie).model_dump(),
+        "detail": "Movie updated successfully."
+    }

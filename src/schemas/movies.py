@@ -1,60 +1,104 @@
-from datetime import date
+from datetime import date as date_type
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from database.models import MovieStatusEnum
 
-class BaseMovieSchema(BaseModel):
+
+class CountryInputSchema(BaseModel):
+    code: str
+
+
+class GenreInputSchema(BaseModel):
+    name: str
+
+
+class ActorInputSchema(BaseModel):
+    name: str
+
+
+class LanguageInputSchema(BaseModel):
+    name: str
+
+
+class CountryDetailSchema(BaseModel):
+    id: int
+    code: str
+    name: str | None
+
     model_config = ConfigDict(from_attributes=True)
-    name: str = Field(..., max_length=255)
-    date: date
-    score: float = Field(..., ge=0, le=100)
+
+
+class ActorDetailSchema(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class LanguageDetailSchema(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GenreDetailSchema(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MovieBase(BaseModel):
+    name: str
+    date: date_type
+    score: float
     overview: str
+
+
+class MovieDetailSchema(MovieBase):
+    id: int
     status: str
-    budget: float = Field(..., ge=0)
-    revenue: float = Field(..., ge=0)
-    country: str | None
+    budget: float
+    revenue: float
+    country: CountryDetailSchema
+    genres: list[GenreDetailSchema]
+    actors: list[ActorDetailSchema]
+    languages: list[LanguageDetailSchema]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MovieCreateSchema(MovieBase):
+    status: MovieStatusEnum
+    budget: float
+    revenue: float
+    country: str
     genres: list[str]
     actors: list[str]
     languages: list[str]
 
-    @field_validator("date")
-    @classmethod
-    def validate_date(cls, value):
-        if value > date.today().replace(year=date.today().year + 1):
-            raise ValueError("Date cannot be more than one year in the future")
-        return value
 
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value):
-        valid_statuses = ["Released", "Post Production", "In Production"]
-        if value not in valid_statuses:
-            raise ValueError(f"Status must be one of: {', '.join(valid_statuses)}")
-        return value
+class MovieUpdateSchema(MovieBase):
+    name: str | None = None
+    date: date_type | None = None
+    score: float | None = None
+    overview: str | None = None
+    status: MovieStatusEnum | None = None
+    budget: float | None = None
+    revenue: float | None = None
+    country: str | None = None
+    genres: list[str] | None = None
+    actors: list[str] | None = None
+    languages: list[str] | None = None
 
 
-class MovieListItemSchema(BaseModel):
+class MovieListItemSchema(MovieBase):
     id: int
-    name: str
-    date: date
-    score: float
-    overview: str
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_schema_extra={
-            "examples": [
-                {
-                    "id": 9936,
-                    "name": "Avatar new",
-                    "date": "2022-12-15",
-                    "score": 78.0,
-                    "overview": "Set more than a decade after the events of the first film...",
-                }
-            ]
-        },
-    )
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MovieListResponseSchema(BaseModel):
@@ -111,7 +155,7 @@ class LanguageSchema(BaseModel):
 class MovieDetailResponseSchema(BaseModel):
     id: int
     name: str
-    date: date
+    date: date_type
     score: float
     overview: str
     status: str
@@ -152,60 +196,5 @@ class MovieDetailResponseSchema(BaseModel):
     )
 
 
-class MovieCreateSchema(BaseModel):
-    name: str = Field(..., max_length=255)
-    date: date
-    score: float = Field(..., ge=0, le=100)
-    overview: str
-    status: str
-    budget: float = Field(..., ge=0)
-    revenue: float = Field(..., ge=0)
-    country: str
-    genres: list[str]
-    actors: list[str]
-    languages: list[str]
-
-    @field_validator("date")
-    @classmethod
-    def validate_date(cls, value):
-        if value > date.today().replace(year=date.today().year + 1):
-            raise ValueError("Date cannot be more than one year in the future")
-        return value
-
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value):
-        valid_statuses = ["Released", "Post Production", "In Production"]
-        if value not in valid_statuses:
-            raise ValueError(f"Status must be one of: {', '.join(valid_statuses)}")
-        return value
-
-
-class MovieUpdateSchema(BaseModel):
-    name: str | None = Field(None, max_length=255)
-    date: Optional[date] = None
-    score: float | None = Field(None, ge=0, le=100)
-    overview: str | None = None
-    status: str | None = None
-    budget: float | None = Field(None, ge=0)
-    revenue: float | None = Field(None, ge=0)
-    country: str | None = None
-    genres: list[str] | None = None
-    actors: list[str] | None = None
-    languages: list[str] | None = None
-
-    @field_validator("date")
-    @classmethod
-    def validate_date(cls, value):
-        if value and value > date.today().replace(year=date.today().year + 1):
-            raise ValueError("Date cannot be more than one year in the future")
-        return value
-
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value):
-        if value:
-            valid_statuses = ["Released", "Post Production", "In Production"]
-            if value not in valid_statuses:
-                raise ValueError(f"Status must be one of: {', '.join(valid_statuses)}")
-        return value
+class MovieUpdateResponseSchema(MovieDetailResponseSchema):
+    detail: str
