@@ -14,8 +14,9 @@ class BaseMovieSchema(BaseModel):
     budget: float = Field(..., ge=0)
     revenue: float = Field(..., ge=0)
     country: str | None
-    genre: list[str]
-    crew: list[str]
+    genres: list[str]
+    actors: list[str]
+    languages: list[str]
 
     @field_validator("date")
     @classmethod
