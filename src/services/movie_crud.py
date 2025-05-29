@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict, Any
+
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -10,8 +11,8 @@ from database.models import (
     ActorModel,
     LanguageModel
 )
-from schemas.movies import MovieCreateSchema, MovieUpdateSchema
 from mappers.movie_mapper import MovieMapper
+from schemas.movies import MovieCreateSchema, MovieUpdateSchema
 
 
 class MovieService:
@@ -183,4 +184,4 @@ class MovieService:
                 self.db.add(language)
                 await self.db.flush()
             languages.append(language)
-        return languages 
+        return languages

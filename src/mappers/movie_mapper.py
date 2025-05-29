@@ -47,4 +47,4 @@ class MovieMapper:
 
     @staticmethod
     def to_list_items(movies: List[MovieModel]) -> List[Dict[str, Any]]:
-        return [MovieMapper.to_list_item(movie) for movie in movies] 
+        return [MovieMapper.to_list_item(movie) for movie in movies]

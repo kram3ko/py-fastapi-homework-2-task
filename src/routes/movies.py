@@ -23,13 +23,13 @@ async def get_movies(
 ):
     movie_service = MovieService(db)
     result = await movie_service.get_movies(page, per_page)
-    
+
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No movies found."
         )
-    
+
     return result
 
 
@@ -57,7 +57,7 @@ async def create_movie(
 ):
     movie_service = MovieService(db)
     movie = await movie_service.create_movie(movie_data)
-    
+
     if not movie:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -83,7 +83,7 @@ async def update_movie(
 ):
     movie_service = MovieService(db)
     movie = await movie_service.update_movie(movie_id, movie_data)
-    
+
     if not movie:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

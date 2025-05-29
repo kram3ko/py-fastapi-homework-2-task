@@ -133,7 +133,9 @@ class MovieDetailResponseSchema(BaseModel):
                         {"id": 7, "name": "Drama"},
                         {"id": 12, "name": "Action"},
                     ],
-                    "overview": "After dominating the boxing world, Adonis Creed has been thriving in both his career and family life...",
+                    "overview": "After dominating the boxing world,"
+                                " Adonis Creed has been thriving in both "
+                                "his career and family life...",
                     "actors": [
                         {"id": 1, "name": "Michael B. Jordan"},
                         {"id": 2, "name": "Tessa Thompson"},
